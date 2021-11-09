@@ -18,6 +18,13 @@ async function run() {
     await client.connect();
     const database = client.db("drone_world");
     const servicesCollection = database.collection("services");
+
+    //get api
+    app.get("/services", async (req, res) => {
+      const cursor = servicesCollection.find({});
+      const services = await cursor.toArray();
+      res.send(services);
+    });
   } finally {
     //   await client.close();
   }
