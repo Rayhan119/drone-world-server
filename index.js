@@ -35,13 +35,29 @@ async function run() {
       const service = await servicesCollection.findOne(qurey);
       res.json(service);
     });
-    //orders get api
+    //all order get
+    app.get("/orders", async (req, res) => {
+      const cursor = ordersCollection.find({});
+      const orders = await cursor.toArray();
+      res.send(orders);
+    });
+    //myorders get api
     app.get("/myOrder/:email", async (req, res) => {
-      console.log(req.params.email);
       const result = await ordersCollection
         .find({ userEmail: req.params.email })
         .toArray();
       res.send(result);
+    });
+    //admin email get
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      let isAdmin = false;
+      if (user?.role == "admin") {
+        isAdmin = true;
+      }
+      res.json({ admin: isAdmin });
     });
     //post services
     app.post("/services", async (req, res) => {
@@ -61,13 +77,12 @@ async function run() {
       const result = await usersCollection.insertOne(users);
       res.json(result);
     });
-    //upsert google email
-    app.put("/users", async (req, res) => {
+    //admin
+    app.put("/users/admin", async (req, res) => {
       const users = req.body;
       const filter = { email: users.email };
-      const options = { upsert: true };
-      const updateDoc = { $set: users };
-      const result = usersCollection.updateOne(filter, updateDoc, options);
+      const updateDoc = { $set: { role: "admin" } };
+      const result = await usersCollection.updateOne(filter, updateDoc);
       res.json(result);
     });
   } finally {
