@@ -19,6 +19,7 @@ async function run() {
     await client.connect();
     const database = client.db("drone_world");
     const servicesCollection = database.collection("services");
+    const ordersCollection = database.collection("orders");
 
     //get api
     app.get("/services", async (req, res) => {
@@ -37,8 +38,16 @@ async function run() {
     app.post("/services", async (req, res) => {
       const services = req.body;
       const result = await servicesCollection.insertOne(services);
-      console.log("hit the post", services);
+
       res.send(result);
+    });
+    //post orders
+    app.post("/orders", async (req, res) => {
+      const orders = req.body;
+      console.log(orders);
+      const result = await ordersCollection.insertOne(orders);
+      console.log(result);
+      res.json(result);
     });
   } finally {
     //   await client.close();
