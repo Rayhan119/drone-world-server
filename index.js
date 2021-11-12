@@ -20,6 +20,7 @@ async function run() {
     const database = client.db("drone_world");
     const servicesCollection = database.collection("services");
     const ordersCollection = database.collection("orders");
+    const usersCollection = database.collection("users");
 
     //get api
     app.get("/services", async (req, res) => {
@@ -34,19 +35,39 @@ async function run() {
       const service = await servicesCollection.findOne(qurey);
       res.json(service);
     });
+    //orders get api
+    app.get("/myOrder/:email", async (req, res) => {
+      console.log(req.params.email);
+      const result = await ordersCollection
+        .find({ userEmail: req.params.email })
+        .toArray();
+      res.send(result);
+    });
     //post services
     app.post("/services", async (req, res) => {
       const services = req.body;
       const result = await servicesCollection.insertOne(services);
-
       res.send(result);
     });
     //post orders
     app.post("/orders", async (req, res) => {
       const orders = req.body;
-      console.log(orders);
       const result = await ordersCollection.insertOne(orders);
-      console.log(result);
+      res.json(result);
+    });
+    //post users info
+    app.post("/users", async (req, res) => {
+      const users = req.body;
+      const result = await usersCollection.insertOne(users);
+      res.json(result);
+    });
+    //upsert google email
+    app.put("/users", async (req, res) => {
+      const users = req.body;
+      const filter = { email: users.email };
+      const options = { upsert: true };
+      const updateDoc = { $set: users };
+      const result = usersCollection.updateOne(filter, updateDoc, options);
       res.json(result);
     });
   } finally {
