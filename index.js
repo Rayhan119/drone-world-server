@@ -21,6 +21,7 @@ async function run() {
     const servicesCollection = database.collection("services");
     const ordersCollection = database.collection("orders");
     const usersCollection = database.collection("users");
+    const reviewsCollection = database.collection("reviews");
 
     //get api
     app.get("/services", async (req, res) => {
@@ -40,6 +41,13 @@ async function run() {
       const cursor = ordersCollection.find({});
       const orders = await cursor.toArray();
       res.send(orders);
+    });
+    //delete order
+    app.delete("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await ordersCollection.deleteOne(query);
+      res.json(result);
     });
     //myorders get api
     app.get("/myOrder/:email", async (req, res) => {
@@ -75,6 +83,12 @@ async function run() {
     app.post("/users", async (req, res) => {
       const users = req.body;
       const result = await usersCollection.insertOne(users);
+      res.json(result);
+    });
+    //post reviews
+    app.post("/reviews", async (req, res) => {
+      const reviews = req.body;
+      const result = await reviewsCollection.insertOne(reviews);
       res.json(result);
     });
     //admin
