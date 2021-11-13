@@ -55,6 +55,13 @@ async function run() {
       const result = await ordersCollection.deleteOne(query);
       res.json(result);
     });
+    //delete service
+    app.delete("/services/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await servicesCollection.deleteOne(query);
+      res.json(result);
+    });
     //myorders get api
     app.get("/myOrder/:email", async (req, res) => {
       const result = await ordersCollection
@@ -104,6 +111,15 @@ async function run() {
       const updateDoc = { $set: { role: "admin" } };
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.json(result);
+    });
+    //status
+    app.put("/updateStatus/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await ordersCollection.updateOne(filter, {
+        $set: { status: "Shiped" },
+      });
+      res.send(result);
     });
   } finally {
     //   await client.close();
